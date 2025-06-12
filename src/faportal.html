@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eVoters' QR Service Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+        }
+        .header-container {
+            background: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ddd;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header-container h2 {
+            color: #333;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .header-container a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .main-container {
+            background: white;
+            margin: 30px auto;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            text-align: center;
+        }
+        .search-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .search-options button {
+            border: none;
+            padding: 15px 20px;
+            background: #ddd;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .search-options .active, .search-options button:hover {
+            background: #007bff;
+            color: white;
+        }
+        .search-options button:nth-child(1):hover {
+            background: orange;
+        }
+        .search-options button:nth-child(2):hover {
+            background: whitesmoke;
+            color: black;
+        }
+        .search-options button:nth-child(3):hover {
+            background: green;
+            color: white;
+        }
+        .search-box {
+            margin-top: 20px;
+            padding: 20px;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+        }
+        .form-group div {
+            flex: 1;
+            margin: 0 10px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .captcha {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .captcha img {
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        .buttons button {
+            padding: 14px 22px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 15px;
+            transition: 0.3s;
+        }
+        .buttons .search {
+            background: #007bff;
+            color: white;
+        }
+        .buttons .clear {
+            background: #ccc;
+        }
+        .buttons button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h2>मतदाता सेवा पोर्टल<br>eVOTERS' SERVICE PORTAL</h2>
+            <a href="/">Home</a>
+        </div>
+    </header>
+    <main>
+        <div class="main-container">
+            <h2> Facial Recognition System </h2>
+            <div class="search-options">
+                <button>🔎 ईपीआईसी द्वारा खोजें / Search by Aadhaar</button>
+            </div>
+            <div class="search-box">
+                <form id="faceValidationForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div>
+                            <label>Aadhaar Number *</label>
+                            <input type="text" name="aadhaar" placeholder="Your Aadhaar Number" required>
+                        </div>
+                        <div>
+                            <label>Live Camera Feed *</label>
+                            <video id="camera" autoplay playsinline width="100%" height="300"></video>
+                            <button type="button" id="captureButton" class="search">Capture Image</button>
+                            <canvas id="snapshot" style="display: none;"></canvas>
+                            <input type="hidden" name="live_image" id="liveImageInput">
+                        </div>
+                    </div>
+
+                    <div class="buttons">
+                        <button type="submit" class="search">SEARCH</button>
+                        <button type="reset" class="clear">CLEAR</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('snapshot');
+        const captureButton = document.getElementById('captureButton');
+        const liveImageInput = document.getElementById('liveImageInput');
+
+        // Activate the camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Error accessing the camera:', error);
+                alert('Unable to access the camera. Please check your device settings.');
+            });
+
+        // Capture the image
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            // Reduce dimensions (e.g., half) while maintaining aspect ratio
+            const targetWidth = video.videoWidth / 2;
+            const targetHeight = video.videoHeight / 2;
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            // Draw the image onto the canvas with reduced dimensions
+            context.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+            // Convert the captured image to a Base64 string
+            const imageData = canvas.toDataURL('image/png');
+            liveImageInput.value = imageData; // Store the image data in the hidden input field
+            alert('Image captured successfully!');
+        });
+
+        // Handle form submission
+        document.getElementById('faceValidationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/validate-face', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.indexOf('application/json') !== -1) {
+                    return response.json().then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                } else {
+                    return response.text().then(text => {
+                        console.error('Received non-JSON response:', response.status, text);
+                        alert('An error occurred while verifying the face.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while verifying the face.');
+            });
+        });
+    </script>
+</body>
+</html>

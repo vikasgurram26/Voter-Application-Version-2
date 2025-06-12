@@ -1,0 +1,13 @@
+runtime: python311
+entrypoint: gunicorn -b :$PORT main:app
+
+instance_class: F2  # Adjust instance size as needed
+
+env_variables:
+  DB_USER: "root"
+  DB_PASS: "6304G.Vik@s"
+  DB_NAME: "Voter-Database"
+  INSTANCE_CONNECTION_NAME: "organic-zephyr-462408-k1:asia-south1:voterdata"
+
+beta_settings:
+  cloud_sql_instances: "organic-zephyr-462408-k1:asia-south1:voterdata"

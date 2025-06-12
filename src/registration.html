@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voter Registration Portal</title>
+    <style>
+      /* Basic reset and overall styling */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        color: #333;
+        line-height: 1.6;
+        padding: 20px;
+      }
+      header {
+        background: #fff;
+        padding: 20px 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        position: relative;
+        margin-bottom: 20px;
+      }
+      header h1 {
+        font-size: 28px;
+        color: #007bff;
+      }
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .back-button:hover {
+        background: #0056b3;
+      }
+      .container {
+        max-width: 900px;
+        background: #fff;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      input[type="text"],
+      input[type="tel"],
+      input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      .section-title {
+        margin: 30px 0 15px;
+        font-size: 20px;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+        color: #007bff;
+      }
+      /* Options styling for biometric choices */
+      .biometric-options,
+      .face-options,
+      .fingerprint-options {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+      }
+      .biometric-options label,
+      .face-options label,
+      .fingerprint-options label {
+        font-weight: normal;
+        cursor: pointer;
+      }
+      /* Preview container to align images neatly */
+      .biometric-preview-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .biometric-preview-container img,
+      #videoStream {
+        max-width: 300px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+      }
+      .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        background: #007bff;
+        color: #fff;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button.clear-btn {
+        background: #6c757d;
+      }
+      button.clear-btn:hover {
+        background: #5a6268;
+      }
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 24px;
+        }
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button class="back-button" onclick="window.history.back();">Back</button>
+      <h1>Voter Registration Portal</h1>
+    </header>
+    <div class="container">
+      <h2>Registration Form</h2>
+      <form action="/register" method="POST" enctype="multipart/form-data">
+        <!-- User Details Fields -->
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required />
+        </div>
+        <div class="form-group">
+          <label for="aadhar">Aadhar Card Number *</label>
+          <input type="text" id="aadhar" name="aadhar" placeholder="Enter your Aadhaar number" required />
+        </div>
+        <div class="section-title">Address Details</div>
+        <div class="form-group">
+          <input type="text" name="house_no" placeholder="House No" required />
+        </div>
+        <div class="form-group">
+          <input type="text" name="street" placeholder="Street" required />
+        </div>
+        <div class="form-group">
+          <input type="text" name="landmark" placeholder="Landmark" required />
+        </div>
+        <div class="form-group">
+          <input type="text" name="district" placeholder="District" required />
+        </div>
+        <div class="form-group">
+          <input type="text" name="state" placeholder="State" required />
+        </div>
+        <div class="form-group">
+          <input type="text" name="postal_pin" placeholder="Postal PIN" required />
+        </div>
+        <!-- Biometric Verification Section -->
+        <div class="section-title">Biometric Verification</div>
+
+        <!-- Fingerprint Verification -->
+        <div class="form-group">
+          <label>Fingerprint *</label>
+          <div class="fingerprint-options">
+            <label>
+              <input type="radio" name="fingerprint_option" value="upload" checked onchange="toggleFingerprintOption(this.value)" />
+              Upload Image
+            </label>
+            <label>
+              <input type="radio" name="fingerprint_option" value="scan" onchange="toggleFingerprintOption(this.value)" />
+              Scan Device
+            </label>
+          </div>
+          <!-- Fingerprint Upload / Scan (single container) -->
+          <div id="fingerprintUploadSection">
+            <input type="file" id="fingerprintUploadInput" name="fingerprint_upload" accept="image/*" onchange="previewFingerprintUpload(this)" required />
+          </div>
+          <div id="fingerprintScanSection" style="display: none;">
+            <button type="button" onclick="scanFingerprint()">Scan Fingerprint</button>
+          </div>
+          <div class="biometric-preview-container">
+            <img id="fingerprintPreview" style="display: none;" alt="Fingerprint Preview" />
+          </div>
+        </div>
+
+        <!-- Face Recognition Verification -->
+        <div class="form-group">
+          <label>Face Recognition Image *</label>
+          <div class="face-options">
+            <label>
+              <input type="radio" name="face_option" value="upload" checked onchange="toggleFaceOption(this.value)" />
+              Upload Image
+            </label>
+            <label>
+              <input type="radio" name="face_option" value="capture" onchange="toggleFaceOption(this.value)" />
+              Capture Live Image
+            </label>
+          </div>
+          <div class="face-upload">
+            <input type="file" id="faceUploadInput" name="face_upload" accept="image/*" onchange="previewFaceUpload(this)" />
+          </div>
+          <div class="face-capture" style="display: none;">
+            <video id="videoStream" autoplay playsinline></video>
+            <button type="button" onclick="captureFaceImage()">Capture Image</button>
+            <canvas id="captureCanvas" style="display: none;"></canvas>
+            <!-- Hidden input stores captured image as a Base64 string -->
+            <input type="hidden" id="capturedFaceInput" name="face_capture" />
+          </div>
+          <div class="biometric-preview-container">
+            <img id="facePreview" style="display: none;" alt="Face Preview" />
+          </div>
+        </div>
+
+        <!-- Submit & Clear Buttons -->
+        <div class="btn-group">
+          <button type="submit">Submit</button>
+          <button type="reset" class="clear-btn" onclick="resetBiometricSections()">Clear</button>
+        </div>
+      </form>
+    </div>
+    <script>
+      // Fingerprint handling
+      function toggleFingerprintOption(choice) {
+        const uploadSection = document.getElementById('fingerprintUploadSection');
+        const scanSection = document.getElementById('fingerprintScanSection');
+        const uploadInput = document.getElementById('fingerprintUploadInput');
+        if (choice === "upload") {
+          uploadSection.style.display = 'block';
+          scanSection.style.display = 'none';
+          // Set the file input as required for upload option
+          uploadInput.required = true;
+        } else {
+          uploadSection.style.display = 'none';
+          scanSection.style.display = 'block';
+          // Remove the required attribute when scanning is used
+          uploadInput.required = false;
+        }
+      }
+
+      // Face handling
+      function toggleFaceOption(choice) {
+        const faceUpload = document.querySelector('.face-upload');
+        const faceCapture = document.querySelector('.face-capture');
+        const faceUploadInput = document.getElementById('faceUploadInput');
+        if (choice === "upload") {
+          faceUpload.style.display = 'block';
+          faceCapture.style.display = 'none';
+          // Add required attribute when upload option is selected
+          faceUploadInput.setAttribute('required', 'required');
+          stopVideoStream();
+        } else {
+          faceUpload.style.display = 'none';
+          faceCapture.style.display = 'block';
+          // Remove required attribute when live capture is chosen
+          faceUploadInput.removeAttribute('required');
+          startVideoStream();
+        }
+      }
+
+      function previewFingerprintUpload(input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.getElementById('fingerprintPreview');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+      function scanFingerprint() {
+        // Simulate fingerprint scanning. Replace sampleData with real scanned output.
+        const sampleData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA..."; 
+        const preview = document.getElementById('fingerprintPreview');
+        preview.src = sampleData;
+        preview.style.display = 'block';
+      }
+      
+      function previewFaceUpload(input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.getElementById('facePreview');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+      let videoStream = null;
+      function startVideoStream() {
+        const video = document.getElementById('videoStream');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            videoStream = stream;
+            video.srcObject = stream;
+          })
+          .catch(err => {
+            console.error("Error accessing camera:", err);
+          });
+        }
+      }
+      function stopVideoStream() {
+        if (videoStream) {
+          videoStream.getTracks().forEach(track => track.stop());
+          videoStream = null;
+        }
+      }
+      function captureFaceImage() {
+        const video = document.getElementById('videoStream');
+        const canvas = document.getElementById('captureCanvas');
+        // Optionally set a lower resolution (e.g., 640px width)
+        const targetWidth = 640;
+        const scale = targetWidth / video.videoWidth;
+        canvas.width = targetWidth;
+        canvas.height = video.videoHeight * scale;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Convert to a compressed JPEG with quality (e.g., 0.5)
+        const imageData = canvas.toDataURL('image/jpeg', 0.5);
+        const preview = document.getElementById('facePreview');
+        preview.src = imageData;
+        preview.style.display = 'block';
+        // Store captured image in hidden input
+        document.getElementById('capturedFaceInput').value = imageData;
+        stopVideoStream();
+      }
+      function resetBiometricSections() {
+        document.getElementById('fingerprintPreview').style.display = 'none';
+        document.getElementById('facePreview').style.display = 'none';
+        document.getElementById('faceUploadInput').value = "";
+        document.getElementById('fingerprintUploadInput').value = "";
+        stopVideoStream();
+      }
+      
+      // Initialize default options
+      toggleFingerprintOption("upload");
+      toggleFaceOption("upload");
+    </script>
+  </body>
+</html>

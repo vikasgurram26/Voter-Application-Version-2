@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://www.pngkit.com/png/full/951-9515339_prime-minister-narendra-modis-address-to-the-nation.png" type="image/png">
+  <title>eVOTER'S Portal</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #eef2f3, #8e9eab);
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .header-container {
+      background: #ffffff;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .header-container h2 {
+      color: #333;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .header-container a {
+      text-decoration: none;
+      color: #0066cc;
+      font-weight: 500;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    .header-container a:hover {
+      color: #ffdd57;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #0077cc;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      transition: border 0.3s ease;
+    }
+    input:focus {
+      border-color: #0077cc;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      background: #0077cc;
+      color: #fff;
+      padding: 14px;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #005fa3;
+      transform: translateY(-2px);
+    }
+    button.verify {
+      background: #28a745;
+      margin-top: 10px;
+    }
+    button.verify:hover {
+      background: #218838;
+    }
+    .voter-details {
+      margin-top: 30px;
+      padding: 20px;
+      border-top: 1px solid #ddd;
+    }
+    .voter-details p {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+    .voter-details img {
+      display: block;
+      width: 150px;
+      height: auto;
+      border-radius: 6px;
+      margin-top: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .qr-code {
+      margin-top: 30px;
+      text-align: center;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 30px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+    }
+    .modal h2 {
+      margin-bottom: 20px;
+      color: #0077cc;
+    }
+    .modal a {
+      display: block;
+      margin-top: 20px;
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+    .modal a:hover {
+      color: #005fa3;
+    }
+    .modal button {
+      margin-top: 10px;
+      background: #0077cc;
+      padding: 12px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    .modal button:hover {
+      background: #005fa3;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    function verifyFingerprint() {
+      // Add your fingerprint verification logic here
+      alert('Fingerprint verification process initiated.');
+      generateQRCode('{{ voter.aadhar }}');
+    }
+    function generateQRCode(aadhar) {
+      // Generate a unique security code using current timestamp (you can modify this for more complexity)
+      const uniqueCode = Date.now(); // Unique security code
+      // Combine the voter's Aadhar and the unique code
+      const qrValue = aadhar + "-" + uniqueCode;
+      
+      // Generate QR code with the combined value
+      var qrcodeContainer = document.getElementById('qrcode');
+      qrcodeContainer.innerHTML = '';
+      var qrcode = new QRCode(qrcodeContainer, {
+        text: qrValue,
+        width: 128,
+        height: 128,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+      
+      // Open the modal with the QR code
+      var modal = document.getElementById('qrModal');
+      modal.style.display = 'block';
+      setTimeout(function() {
+        var qrCanvas = qrcodeContainer.querySelector('canvas');
+        var downloadLink = document.getElementById('downloadLink');
+        downloadLink.href = qrCanvas.toDataURL('image/png');
+        downloadLink.download = 'qrcode.png';
+      }, 500);
+    }
+    function closeModal() {
+      document.getElementById('qrModal').style.display = 'none';
+    }
+    function printQRCode() {
+      var printWindow = window.open('', '_blank');
+      var qrCanvas = document.getElementById('qrcode').querySelector('canvas');
+      var qrImage = qrCanvas.toDataURL('image/png');
+      printWindow.document.write('<img src="' + qrImage + '">');
+      printWindow.document.close();
+      printWindow.print();
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <h2>मतदाता सेवा पोर्टल<br>eVOTERS' SERVICE PORTAL</h2>
+      <a href="/">Home</a>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <h1>Voter Portal</h1>
+      <form method="POST">
+        <div class="form-group">
+          <label for="aadhar">Enter Aadhar Card Number</label>
+          <input type="text" id="aadhar" name="aadhar" pattern="\d{12}" maxlength="12" required>
+        </div>
+        <button type="submit">Fetch Details</button>
+      </form>
+      
+      {% if voter %}
+      <div class="voter-details">
+        <h2>Voter Details</h2>
+        <p><strong>Full Name:</strong> {{ voter.name }}</p>
+        <p><strong>Phone Number:</strong> {{ voter.phone }}</p>
+        <p><strong>Aadhar Card Number:</strong> {{ voter.aadhar }}</p>
+        <p><strong>Address:</strong> {{ voter.house_no }}, {{ voter.street }}, {{ voter.landmark }}, {{ voter.district }}, {{ voter.state }}, {{ voter.postal_pin }}</p>
+        
+        {% if voter.fingerprint %}
+        <p><strong>Fingerprint:</strong></p>
+        <img src="data:image/jpeg;base64,{{ voter.fingerprint }}" alt="Fingerprint">
+        <button type="button" class="verify" onclick="verifyFingerprint()">Verify Fingerprint</button>
+        {% endif %}
+        
+        {% if voter.face %}
+        <p><strong>Face Recognition Image:</strong></p>
+        <img src="data:image/jpeg;base64,{{ voter.face }}" alt="Face">
+        {% endif %}
+      </div>
+      <div id="qrcode" class="qr-code"></div>
+      {% endif %}
+    </div>
+  </main>
+  
+  <!-- Modal for QR Code -->
+  <div id="qrModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>QR Code</h2>
+      <div id="qrcode"></div>
+      <a id="downloadLink" href="#" download="qrcode.png">Download QR Code</a>
+      <button onclick="printQRCode()">Print QR Code</button>
+    </div>
+  </div>
+</body>
+</html>
